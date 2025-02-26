@@ -42,7 +42,7 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // ----------------------------------------------------
     
     // RENDER OPTIONS
-    bool renderScene = true;
+    bool renderScene = false;
     std::vector<Car> cars = initHighway(renderScene, viewer);
     
     // TODO:: Create lidar sensor 
@@ -54,9 +54,12 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // ptr type from pointcloud indicates that the object is a 32bit integer that contains the memory 
     // address of your point cloud object.
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = lidar->scan();    
+    // pcl::PointCloud<PointT>::ptr cloud = lidar->scan(); 
     // Vect3 origin(0.0, 0.0, 0.5);
     // renderRays(viewer, origin, cloud);
-    renderRays(viewer, lidar->position, cloud);
+    // renderRays(viewer, lidar->position, cloud);
+    Color red = Color(0,255,0);
+    renderPointCloud(viewer, cloud, "LidarPCD", red);
 
 
 
