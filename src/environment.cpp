@@ -46,6 +46,19 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     std::vector<Car> cars = initHighway(renderScene, viewer);
     
     // TODO:: Create lidar sensor 
+    // instantaniate a pointer to a lidar object. create lidar pointer object on the heap using new keyword
+    // lidar object is going to hold pcd which could be very large.
+    // hence instantaniating on heap, we have more memory to work with than the 2MB on the stack.
+    // hence it takes longer time to look objects on the heap while on stack lookup is very fast.
+    Lidar* lidar = new Lidar(cars, 0.0);
+    // ptr type from pointcloud indicates that the object is a 32bit integer that contains the memory 
+    // address of your point cloud object.
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = lidar->scan();    
+    // Vect3 origin(0.0, 0.0, 0.5);
+    // renderRays(viewer, origin, cloud);
+    renderRays(viewer, lidar->position, cloud);
+
+
 
     // TODO:: Create point processor
   
@@ -87,6 +100,6 @@ int main (int argc, char** argv)
 
     while (!viewer->wasStopped ())
     {
-        viewer->spinOnce ();
+        viewer->spin();
     } 
 }
