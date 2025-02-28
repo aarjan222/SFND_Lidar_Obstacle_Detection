@@ -53,17 +53,31 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     Lidar* lidar = new Lidar(cars, 0.0);
     // ptr type from pointcloud indicates that the object is a 32bit integer that contains the memory 
     // address of your point cloud object.
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = lidar->scan();    
+    pcl::PointCloud<pcl::PointXYZ>::Ptr inputCloud = lidar->scan();    
     // pcl::PointCloud<PointT>::ptr cloud = lidar->scan(); 
     // Vect3 origin(0.0, 0.0, 0.5);
     // renderRays(viewer, origin, cloud);
     // renderRays(viewer, lidar->position, cloud);
-    Color red = Color(0,255,0);
-    renderPointCloud(viewer, cloud, "LidarPCD", red);
+    Color red = Color(255,0,0);
+    Color green = Color(0,255,0);
+    Color blue = Color(0,0,255);
+
+    // turn off coming new point clouds as it may overlap
+    // renderPointCloud(viewer, inputCloud, "LidarPCD", green);
+    // road points = green, other obstacles = red
 
 
 
     // TODO:: Create point processor
+    // stack intitialization
+    ProcessPointClouds<pcl::PointXYZ> pointProcessor;
+    // heap initialization
+    // ProcessPointClouds<pcl::PointXYZ>* pointProcessor = new ProcessPointClouds<pcl::PointXYZ>();
+
+
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(inputCloud, 100, 0.4);
+    renderPointCloud(viewer, segmentCloud.first, "Obstacles", red);
+    renderPointCloud(viewer, segmentCloud.second, "Road", green);
   
 }
 

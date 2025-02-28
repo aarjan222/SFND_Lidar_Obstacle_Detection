@@ -91,7 +91,7 @@ struct Lidar
 		resoultion = 0.2;
 		// TODO:: set sderr to 0.2 to get more interesting pcd files
 		// add noise
-		sderr = 0.2;
+		sderr = 0.4;
 		cars = setCars;
 		groundSlope = setGroundSlope;
 
