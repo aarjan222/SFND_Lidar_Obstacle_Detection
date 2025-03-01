@@ -56,7 +56,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     extract.setNegative(true);
     extract.filter(*obstCloud);
     
-    std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(obstCloud, planeCloud);
+    std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(obstCloud, planeCloud);// obst means not road, plane means road
     return segResult;
 }
 
@@ -104,6 +104,33 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
 
     // TODO:: Fill in the function to perform euclidean clustering to group detected obstacles
+    typename pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>);
+    tree->setInputCloud(cloud);
+
+    std::vector<pcl::PointIndices> clusterIndices;
+    pcl::EuclideanClusterExtraction<PointT> ec;
+    ec.setClusterTolerance(clusterTolerance);
+    ec.setMinClusterSize(minSize);
+    ec.setMaxClusterSize(maxSize);
+    ec.setSearchMethod(tree);
+    ec.setInputCloud(cloud);
+    ec.extract(clusterIndices);
+
+    // Go through those clusterIndices, and create some point clouds
+    //  and each point cloud is going to be a different cluster.
+    for(pcl::PointIndices getIndices: clusterIndices){
+        typename pcl::PointCloud<PointT>::Ptr cloudCluster(new pcl::PointCloud<PointT>);
+
+        for(int index: getIndices.indices){
+            cloudCluster->points.push_back(cloud->points[index]);
+        }
+
+        cloudCluster->width = cloudCluster->points.size();
+        cloudCluster->height = 1;
+        cloudCluster->is_dense = true;
+
+        clusters.push_back(cloudCluster);
+    }
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
